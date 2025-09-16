@@ -23,7 +23,7 @@ function App() {
         Topic Bubble Chart
       </h1>
 
-      <div className="flex flex-1 w-full bg-gray-300">
+      <div className="flex flex-1 w-full bg-black">
         {/* Chart container */}
         <div
           className={`flex justify-center transition-all duration-300 ${
