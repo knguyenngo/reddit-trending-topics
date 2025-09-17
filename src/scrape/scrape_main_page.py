@@ -1,61 +1,81 @@
-import json
-import requests
-import time
+import json, time, sys, praw, getopt
 
-# Input: Sub name, listing (hot, new..), total posts to grab, ending post id (for pagination)
+options = "s:nhtcl:dwm"
+long_options = ["subreddit=", "new", "hot", "controversial", "top", "limit=", "day", "week", "month"]
+ID = "REDACTED_ID"
+SECRET = "REDACTED_SECRET"
+AGENT = "topic-modeler"
+
+# Input: Sub name, listing, post limit, time range
+# Default: None, new, 100 posts, last 24 HOURS
 # Output: Save raw .JSON to /data/raw/
-def get_raw_data(subreddit, listing, post_count, post_id):
-    # URL and header
-    url = f"https://www.reddit.com/r/{subreddit}/{listing}.json?limit={post_count}&after={post_id}" 
-    # Identifier 
-    headers = {
-        "User-Agent": "testAgent"   
-    }
+def get_raw_data(sub_name, listing="new", listing_args={"limit":100}, time_range=time.time()-86400):
+    # Reddit instance
+    reddit = praw.Reddit(
+        client_id=ID,
+        client_secret=SECRET,
+        user_agent=AGENT
+    )
+
+    # Subreddit instance
+    sub = reddit.subreddit(sub_name)
+
+    # Extract posts under given listing
+    listing_func = getattr(sub, listing)
+    submissions = listing_func(**listing_args)
+
+    # Current date and time of data extraction
+    current_time = time.strftime("%Y-%m-%d", time.localtime(time.time()))
     
-    # Sent a request
-    response = requests.get(url, headers=headers)
+    # Dictionary for post id, title and time created
+    data = {}
+    
+    # Grabs all submissions from time range
+    for submission in submissions:
+        time_created = submission.created_utc
+        if time_created > time_range:
+            data[submission.id] = [submission.title, time_created]
 
-    # Retrieve .json
-    if response.status_code == 200:
-        new_data = response.json()
-        try:
-            with open("../data/raw/main.json", "r") as json_file:
-                existing_data = json.load(json_file)
-        except (FileNotFoundError, json.decoder.JSONDecodeError):
-            existing_data = []
-
-        # Add to existing data
-        existing_data.append(new_data)
-
-        ## Save JSON
-        with open("../data/raw/main.json", "w") as json_file:
-            json.dump(existing_data, json_file, indent=1)
-            print("New data appended to JSON")
-            return new_data["data"]["after"], new_data["data"]["children"][-1]
-    else:
-        print("Failed to retrieve page. Status code:", response.status_code)
-        return -1, None
+    # Save JSON
+    with open(f"../data/raw/posts_{current_time}.json", "w") as json_file:
+        json.dump(data, json_file, indent=1)
+        print(f"Successfully extracted from r/{sub_name}")
 
 def main():
-    ## Options for URL
-    subreddit = "MMA"
-    listing = "new" # hot, new, best, top
-    post_id = "" # New page appear after this post
-    stop = time.time()-86400
-    posts = set()
+    # Read in arguments
+    args = sys.argv[1:]
+    sub_name = ""
+    listing = ""
+    listing_args = None
+    time_range = None
 
-    ## Scrape all posts from LAST 24 HOURS
-    ## now - 86400 seconds = LAST 24 HOURS
-    ## now - 604800 seconds = LAST WEEK
-    while True:
-        post_id, last_post = get_raw_data(subreddit, listing, 100, post_id)
-        if post_id == -1:
-            break
-        if last_post["data"]["created"] < stop:
-            break
-        if post_id in posts:
-            break
-        posts.add(post_id)
+    # Parse options and values
+    try:
+        arguments, values = getopt.getopt(args, options, long_options)
+        for currentArg, currentVal in arguments:
+            if currentArg in ("-s", "--subreddit"):
+                sub_name = currentVal
+            elif currentArg in ("-n", "--new"):
+                listing = "new"
+            elif currentArg in ("-h", "--hot"):
+                listing = "hot"
+            elif currentArg in ("-t", "--top"):
+                listing = "top"
+            elif currentArg in ("-c", "--controversial"):
+                listing = "controversial"
+            elif currentArg in ("-l", "--limit"):
+                listing_args = {"limit": int(currentVal)}
+            elif currentArg in ("-d", "--day"):
+                time_range = time.time()-86400
+            elif currentArg in ("-w", "--week"):
+                time_range = time.time()-604800
+            elif currentArg in ("-m", "--month"):
+                time_range = time.time()-2629743
+    except getopt.error as err:
+        print(str(err))
+
+    # Scrape all posts under listing within time range
+    get_raw_data(sub_name, listing, listing_args, time_range)
 
 if __name__ == "__main__":
     main()
