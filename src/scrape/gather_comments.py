@@ -1,52 +1,59 @@
-import json
+import json, time, sys, praw, getopt
+
+options = "f:"
+long_options = ["file="]
+ID = "REDACTED_ID"
+SECRET = "REDACTED_SECRET"
+AGENT = "topic-modeler"
 
 def gather_comments(path):
-    # Load data
+    # Load posts JSON: id, title, time created
     try:
-        with open(path, "r") as flattened_list:
-            data = json.load(flattened_list)
-    # No more posts
+        with open(path, "r") as posts:
+            post_data = json.load(posts)
+    # No file for given path
     except FileNotFoundError:
         print(f"File not found: {path}")
-        return -1, None
+        return
     # Decoding error
     except json.decoder.JSONDecodeError as e:
         print(f"JSON decode error in file: {path}")
         print(f"Error: {e}")
-        return -1, None
+        return
 
-    post_comments = {}
-    post_title = ""
+    # Reddit instance
+    reddit = praw.Reddit(
+        client_id=ID,
+        client_secret=SECRET,
+        user_agent=AGENT
+    )
 
-    for k in data:
-        entry = data[k]
-        # Get title of post and initialize k, v for post in dict
-        if "data_title" in k and entry != post_title:
-            post_title = entry
-            post_comments[post_title] = []
-        # Add post as key and add comment to list value
-        if "body" in k and "html" not in k:
-            comments = post_comments[post_title]
-            comments.append(entry)
+    # Current date and time of data extraction
+    current_time = time.strftime("%Y-%m-%d", time.localtime(time.time()))
 
-    return 0, post_comments
+    # Gather comments from post ID
+    for post_id in post_data.keys():
+        submission = reddit.submission(id=post_id)
+        submission.comments.replace_more(limit=None)
+        all_comments = [c.body for c in submission.comments.list()]
+
+        # Save JSON
+        with open(f"../data/raw/post_comments/{post_id}_{current_time}.json", "w") as json_file:
+            json.dump(all_comments, json_file, indent=1)
 
 def main():
-    main = {}
-    i = 0
-    
-    # Add dictionary of post with comments to main dictionary
-    while True:
-        FILE_PATH = f"../data/clean/flattened/flattened_{i}.json"
-        status, post_dic = gather_comments(FILE_PATH)
-        if status < 0:
-            break
-        i += 1
-        main.update(post_dic)
-    
-    # Save dictionary of posts mapped to comments to JSON
-    with open("../data/clean/posts_comments.json", "w") as json_file:
-        json.dump(main, json_file, indent=1)
+    args = sys.argv[1:]
+    file_path = ""
+
+    try:
+        arguments, values = getopt.getopt(args, options, long_options)
+        for currentArg, currentVal in arguments:
+            if currentArg in ("-f", "--file"):
+                file_path = currentVal
+    except getopt.error as err:
+        print(str(err))
+ 
+    gather_comments(file_path)
 
 if __name__ == "__main__":
     main()
