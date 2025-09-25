@@ -1,15 +1,28 @@
 import json, time, sys, praw, getopt
+from pathlib import Path
 
-options = "s:nhtcl:dwm"
-long_options = ["subreddit=", "new", "hot", "controversial", "top", "limit=", "day", "week", "month"]
+options = "s:nhtcl:f:u:"
+long_options = ["subreddit=", "new", "hot", "controversial", "top", "limit=", "from-hours=", "until-hours="]
 ID = "REDACTED_ID"
 SECRET = "REDACTED_SECRET"
 AGENT = "topic-modeler"
 
+# Find root folder
+def find_project_root():
+    current = Path(__file__).parent
+    while current != current.parent:
+        if current.name == "Reddit_Scraper":
+            return current
+        current = current.parent
+    return Path(__file__).parent  # Fallback
+
+project_root = find_project_root()
+data_dir = project_root / "src" / "data" / "raw"
+
 # Input: Sub name, listing, post limit, time range
 # Default: None, new, 100 posts, last 24 HOURS
 # Output: Save raw .JSON to /data/raw/
-def get_raw_data(sub_name, listing="new", listing_args={"limit":100}, time_range=time.time()-86400):
+def get_raw_data(sub_name, from_hours, until_hours, listing="new", listing_args={"limit":100}):
     # Reddit instance
     reddit = praw.Reddit(
         client_id=ID,
@@ -25,21 +38,30 @@ def get_raw_data(sub_name, listing="new", listing_args={"limit":100}, time_range
     submissions = listing_func(**listing_args)
 
     # Current date and time of data extraction
-    current_time = time.strftime("%Y-%m-%d", time.localtime(time.time()))
+    current_date = time.strftime("%Y-%m-%d", time.localtime(time.time()))
+    current_time = time.time()
+
+    # Time range for posts
+    time_start = time.time() - (from_hours*3600) if from_hours else None
+    time_end = time.time() - (until_hours*3600) if until_hours else None
     
     # Dictionary for post id, title and time created
     data = {}
-    
+
     # Grabs all submissions from time range
     for submission in submissions:
         time_created = submission.created_utc
-        if time_created > time_range:
-            data[submission.id] = [submission.title, time_created]
 
+        if (time_created >= time_start and time_created <= time_end):
+            data[submission.id] = {"title": submission.title, "time_created": time_created}
+
+    sorted_data = dict(sorted(data.items(), key=lambda x: x[1]["time_created"]))
+    # JSON filename
+    filename = data_dir / f"posts_{current_date}_{current_time}.json"
     # Save JSON
-    with open(f"../data/raw/posts_{current_time}.json", "w") as json_file:
-        json.dump(data, json_file, indent=1)
-        print(f"Successfully extracted from r/{sub_name}")
+    with open(filename, "w") as json_file:
+        json.dump(sorted_data, json_file, indent=1)
+    print(filename)
 
 def main():
     # Read in arguments
@@ -65,17 +87,15 @@ def main():
                 listing = "controversial"
             elif currentArg in ("-l", "--limit"):
                 listing_args = {"limit": int(currentVal)}
-            elif currentArg in ("-d", "--day"):
-                time_range = time.time()-86400
-            elif currentArg in ("-w", "--week"):
-                time_range = time.time()-604800
-            elif currentArg in ("-m", "--month"):
-                time_range = time.time()-2629743
+            elif currentArg in ("-f", "--from-hours"):
+                from_hours = int(currentVal)
+            elif currentArg in ("-u", "--until-hours"):
+                until_hours = int(currentVal)
     except getopt.error as err:
         print(str(err))
 
     # Scrape all posts under listing within time range
-    get_raw_data(sub_name, listing, listing_args, time_range)
+    get_raw_data(sub_name, from_hours, until_hours, listing, listing_args)
 
 if __name__ == "__main__":
     main()
