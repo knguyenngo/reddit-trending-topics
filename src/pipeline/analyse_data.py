@@ -14,9 +14,9 @@ from datetime import datetime, timedelta
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = SCRIPT_DIR.parent.parent
 
-COMMENT_DIR = PROJECT_DIR / "data" / "raw" / "post_comments"
-RAW_DIR = PROJECT_DIR / "data" / "raw"
-OUTPUT_DIR = PROJECT_DIR / "data" / "clean"
+COMMENT_DIR = PROJECT_DIR / "src" / "data" / "raw" / "post_comments"
+RAW_DIR = PROJECT_DIR / "src" / "data" / "raw"
+OUTPUT_DIR = PROJECT_DIR / "src" / "data" / "clean"
 
 def load_posts_metadata():
     """Load original posts data for context"""
