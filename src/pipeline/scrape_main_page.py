@@ -70,6 +70,8 @@ def main():
     listing = ""
     listing_args = None
     time_range = None
+    from_hours = None
+    until_hours = None
 
     # Parse options and values
     try:
