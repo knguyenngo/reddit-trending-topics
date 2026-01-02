@@ -1,11 +1,12 @@
 import json, time, sys, praw, getopt, os
 from pathlib import Path
+import os
 
 options = "i:"
 long_options = ["input="]
-ID = "REDACTED_ID"
-SECRET = "REDACTED_SECRET"
-AGENT = "topic-modeler"
+ID = os.getenv("REDDIT_CLIENT_ID")
+SECRET = os.getenv("REDDIT_CLIENT_SECRET")
+AGENT = os.getenv("REDDIT_USER_AGENT", "topic-modeler")
 
 # Find root folder
 def find_project_root():
