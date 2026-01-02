@@ -57,9 +57,15 @@ Create MVP by visualizing scraped data: React/TS Vite App
 1. Continue with design on Figma (CRAPPY)
 2. Figure out components: Comments, Topic Bubbles, Posts (DONE BUT NEED REFINEMENT)
 3. Restructure data for visualization in React App (DONE, JSON now has all posts for each TOPIC)
-4. Continue working on visualizations and refining components (WORKING)
+4. Continue working on visualizations and refining components (DONE, GOOD ENOUGH MOCKUP)
 
 ## Phase IV
 
 ### Main Goal
 The goal of this phase is to move from basic Python to Spark for data processing
+
+### To-Do
+1. First change to REDDIT PRAW to fix Reddit limit issue (DONE)
+2. Need to change scrape logic to ensure quality data for DS task (DONE)
+3. Finished Airflow orchestration (DONE)
+4. Figure out how to keep Airflow running to run schedule tasks (WORKING): Potentially use Oracle, for now run locally and maybe figure out how to start airflow at specific time to run DAG
