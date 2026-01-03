@@ -1,14 +1,16 @@
 # Reddit Theme Explorer
 
-A full-stack app for exploring Reddit discussions by grouping posts and comments into clear themes and visualizing them in an interactive dashboard.
-
----
-
 ## What this is
 
 This project pulls posts and comments from a subreddit, organizes conversations into high-level themes, and presents them in a simple UI so it’s easier to see what people are actually talking about.
 
 Data is collected in snapshots, so each run captures a moment in time rather than trying to mirror Reddit live.
+
+---
+
+## Why it’s useful
+
+Large Reddit threads are hard to read once they grow. This app focuses on making conversations easier to explore by organizing discussion at the theme level and surfacing representative posts and comments.
 
 ---
 
@@ -29,12 +31,6 @@ Data is collected in snapshots, so each run captures a moment in time rather tha
 - **Apache Airflow** – scheduled pipelines  
 - **SQLite** – storing processed results  
 - **React + TypeScript (Vite)** – interactive frontend  
-
----
-
-## Why it’s useful
-
-Large Reddit threads are hard to read once they grow. This app focuses on making conversations easier to explore by organizing discussion at the theme level and surfacing representative posts and comments.
 
 ---
 
