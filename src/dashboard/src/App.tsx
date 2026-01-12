@@ -30,7 +30,7 @@ function App() {
 selectedTopic ? "w-1/2" : "w-full"
 }`}
         >
-          <BubbleChart data={topics} onSelectTopic={handleSelectTopic} />
+          <BubbleChart data={topics.community_opinions} onSelectTopic={handleSelectTopic} />
         </div>
 
         {/* Comment panel (only if a topic is selected) */}
