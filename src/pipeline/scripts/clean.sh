@@ -1,6 +1,15 @@
+#!/bin/bash
+set -e
+
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+cd "$PROJECT_ROOT"
+
 echo "Cleaning raw post data"
-rm ../../data/raw/*.json
+rm -f src/data/raw/*.json
+
 echo "Cleaning raw comments data"
-rm ../../data/raw/post_comments/*
+rm -f src/data/raw/post_comments/*
+
 echo "Cleaning analysis data"
-rm ../../data/clean/*.json
+rm -f src/data/clean/*.json
+

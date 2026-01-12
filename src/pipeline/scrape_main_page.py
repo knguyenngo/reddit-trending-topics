@@ -1,6 +1,9 @@
 import json, time, sys, praw, getopt
 from pathlib import Path
+from dotenv import load_dotenv
 import os
+
+load_dotenv()
 
 options = "s:nhtcl:f:u:"
 long_options = ["subreddit=", "new", "hot", "controversial", "top", "limit=", "from-hours=", "until-hours="]

@@ -1,6 +1,9 @@
-import json, time, sys, praw, getopt, os
+import json, time, sys, praw, getopt
 from pathlib import Path
+from dotenv import load_dotenv
 import os
+
+load_dotenv()
 
 options = "i:"
 long_options = ["input="]
