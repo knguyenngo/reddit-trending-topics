@@ -12,9 +12,9 @@ def clean(text):
 
     return text
 
+# Tokenize into unigrams
 def tokenize(text):
     tokens = text.split()
-    print(tokens)
 
 #def remove_stopwords(tokens, stopwords):
 
