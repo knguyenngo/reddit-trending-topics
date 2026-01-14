@@ -1,17 +1,21 @@
-import re, string, json
+import re, string, json, unicodedata
 
 # Clean comments
 def clean(text):
-    text = text.lower()
-    text = re.sub(r'\d+', '', text) # Remove numbers
-    text = re.sub(r'http\S+', '', text) # Remove links
-    text = re.sub(r'(?![A-Za-z]\W[A-Za-z])\W', ' ', text) # Remove special chars
+    text = unicodedata.normalize("NFKD", text) # Normalize text
+    text = text.lower() # Lowercase text
+    text = re.sub(r"\d+", "", text) # Remove numbers
+    text = re.sub(r"http\S+", "", text) # Remove links
+    text = re.sub(r"[\u2019]", "#'#", text) # Replace middle apostrophe with pattern to save
+    text = re.sub(r"(?!#)\W(?!#)", " ", text) # Remove all special chars
+    text = re.sub(r"#'#", "'", text) # Revert middle apostrophe back
 
     return text
 
 def tokenize(text):
     tokens = text.split()
     print(tokens)
+
 #def remove_stopwords(tokens, stopwords):
 
 #def load_stopwords():
