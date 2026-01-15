@@ -10,8 +10,8 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
 cd "$PROJECT_ROOT"
 
-POSTS_FILE=$(python src/pipeline/scrape_main_page.py -s MMA -f 72 -u 16 -l 1000 -h)
+POSTS_FILE=$(python src/pipeline/gather_posts.py -s MMA -f 72 -u 16 -l 1000 -h)
 
 python src/pipeline/gather_comments.py --input "$POSTS_FILE"
-python src/pipeline/analyse_data.py
+#python src/pipeline/analyse_data.py
 
