@@ -16,27 +16,31 @@ def tokenize(text):
     tokens = text.split()
     return tokens
 
+# Remove stopwords from list of tokens
 def remove_stopwords(tokens, stopwords):
     tokens = [t for t in tokens if t not in stopwords] # Remove stopwords
     return tokens
 
+# Load in stopwords.json
 def load_stopwords():
     with open("./stopwords.json", mode="r", encoding="utf-8") as read_json:
         stopwords = json.load(read_json)
-    return set(stopwords)
+    return set(stopwords) # Return as set for O(1) search
 
-#def preprocess_comment(text, stopwords):
+# Clean and tokenize text
+def preprocess_comment(text, stopwords):
+    text = clean(text)
+    tokens = tokenize(text)
+    tokens = remove_stopwords(tokens, stopwords)
+    return tokens
 
 def main():
     with open("../data/raw/post_comments/1q8inb4_2026-01-12_1768238336.0916393.json", mode="r", encoding="utf-8") as read_json:
         texts = json.load(read_json)
 
-    stopwords = load_stopwords()
-
     for t in texts[:2]:
-        t = clean(t)
-        tokens = tokenize(t)
-        tokens = remove_stopwords(tokens, stopwords)
+        tokens = preprocess_comment(t, load_stopwords())
+        print(tokens)
 
 if __name__ == "__main__":
     main()
