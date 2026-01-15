@@ -5,7 +5,7 @@ import scrape_functions as sf
 # Clean comments
 def clean(text):
     text = unicodedata.normalize("NFKD", text) # Normalize text
-    text = text.lower() # Lowercase text
+    text= text.lower() # Lowercase text
     text = re.sub(r"\d+", "", text) # Remove numbers
     text = re.sub(r"http\S+", "", text) # Remove links
     text = re.sub(r"[\u2019]", "#'#", text) # Replace middle apostrophe with pattern to save
@@ -51,12 +51,16 @@ def load_comments():
     
     # Add post_id as key and list of comments as value to comments_dict
     for p in path_to_comments:
-        post_id = p.name.split("_")[0]
+        post_id = p.name
         with open(p, mode="r", encoding="utf-8") as read_json:
             comments = json.load(read_json)
             comments_dict[post_id] = comments
     
     return comments_dict
-# Save cleaned comments as JSON
-# def save_tokens():
 
+# Save cleaned comments as JSON
+def save_tokens(tokens, file_name):
+    project_root = sf.find_project_root()
+    clean_dir = project_root / "src" / "data" / "clean" / "post_comments"
+    with open(f"{clean_dir}/{file_name}", "w") as json_file:
+        json.dump(tokens, json_file, indent=1)

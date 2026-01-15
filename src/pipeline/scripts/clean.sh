@@ -10,6 +10,6 @@ rm -f src/data/raw/*.json
 echo "Cleaning raw comments data"
 rm -f src/data/raw/post_comments/*
 
-echo "Cleaning analysis data"
-rm -f src/data/clean/*.json
+echo "Cleaning tokens"
+rm -f src/data/clean/post_comments/*.json
 
