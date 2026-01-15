@@ -1,4 +1,6 @@
-import re, string, json, unicodedata
+import re, string, json, unicodedata, os
+from pathlib import Path
+import scrape_functions as sf
 
 # Clean comments
 def clean(text):
@@ -34,13 +36,27 @@ def preprocess_comment(text, stopwords):
     tokens = remove_stopwords(tokens, stopwords)
     return tokens
 
-def main():
-    with open("../data/raw/post_comments/1q8inb4_2026-01-12_1768238336.0916393.json", mode="r", encoding="utf-8") as read_json:
-        texts = json.load(read_json)
+# Load post:comments JSON from latest posts JSON
+def load_comments():
+    project_root = sf.find_project_root()
+    comments_dir = project_root / "src" / "data" / "raw" / "post_comments"
 
-    for t in texts[:2]:
-        tokens = preprocess_comment(t, load_stopwords())
-        print(tokens)
+    # Get latest time comments were scraped
+    latest_comments_time = str(max(comments_dir.glob("./*.json"), key=os.path.getmtime)).split("_")[-1]
 
-if __name__ == "__main__":
-    main()
+    comments_dict = {}
+
+    # List of paths to latest posts
+    path_to_comments = comments_dir.glob(f"./*{latest_comments_time}")
+    
+    # Add post_id as key and list of comments as value to comments_dict
+    for p in path_to_comments:
+        post_id = p.name.split("_")[0]
+        with open(p, mode="r", encoding="utf-8") as read_json:
+            comments = json.load(read_json)
+            comments_dict[post_id] = comments
+    
+    return comments_dict
+# Save cleaned comments as JSON
+# def save_tokens():
+
