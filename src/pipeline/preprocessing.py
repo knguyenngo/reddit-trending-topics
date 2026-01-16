@@ -9,8 +9,9 @@ def clean(text):
     text = re.sub(r"\d+", "", text) # Remove numbers
     text = re.sub(r"http\S+", "", text) # Remove links
     text = re.sub(r"[\u2019]|'", "#'#", text) # Replace middle apostrophe with pattern to save
-    text = re.sub(r"(?!#)\W(?!#)|(?!')#|#(?!')", " ", text) # Remove all special chars
+    text = re.sub(r"(?!#)\W(?!#)", " ", text) # Remove all special chars
     text = re.sub(r"#'#", "'", text) # Revert middle apostrophe back
+    text = re.sub(r"#", " ", text) # Remove ignored #
     return text
 
 # Tokenize into unigrams
