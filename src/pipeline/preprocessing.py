@@ -37,9 +37,9 @@ def preprocess_comment(text, stopwords):
     return tokens
 
 # Load post:comments JSON from latest posts JSON
-def load_comments():
+def load_comments(dir):
     project_root = sf.find_project_root()
-    comments_dir = project_root / "src" / "data" / "raw" / "post_comments"
+    comments_dir = project_root / "src" / "data" / dir / "post_comments"
 
     # Get latest time comments were scraped
     latest_comments_time = str(max(comments_dir.glob("./*.json"), key=os.path.getmtime)).split("_")[-1]

@@ -3,7 +3,7 @@ import preprocessing as pf
 
 def main():
     # Load dict of filenames/comments and list of stopwords
-    comments = pf.load_comments()
+    comments = pf.load_comments("raw")
     stopwords = pf.load_stopwords()
 
     # Clean then save tokens as JSON
