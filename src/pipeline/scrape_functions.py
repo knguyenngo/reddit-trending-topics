@@ -13,7 +13,7 @@ AGENT = os.getenv("REDDIT_USER_AGENT", "topic-modeler")
 def find_project_root():
     current = Path(__file__).parent
     while current != current.parent:
-        if current.name == "Reddit_Scraper":
+        if current.name == "reddit-nlp":
             return current
         current = current.parent
     return Path(__file__).parent  # Fallback
