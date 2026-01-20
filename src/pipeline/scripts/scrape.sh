@@ -11,6 +11,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 cd "$PROJECT_ROOT"
 
 POSTS_FILE=$(python src/pipeline/gather_posts.py -s MMA -f 72 -u 16 -l 1000 -h)
+# -subname "name" -from "h" -until "h" -limit (num posts) -listing (hot, best, ..)
 
 python src/pipeline/gather_comments.py --input "$POSTS_FILE"
 #python src/pipeline/analyse_data.py

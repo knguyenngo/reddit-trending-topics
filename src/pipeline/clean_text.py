@@ -1,5 +1,5 @@
 import json
-import preprocessing as pf
+import preprocessing_functions as pf
 
 def main():
     # Load dict of filenames/comments and list of stopwords
