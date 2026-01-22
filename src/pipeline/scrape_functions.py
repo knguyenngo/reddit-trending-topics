@@ -2,6 +2,7 @@ import os
 import json, time, praw
 from pathlib import Path
 from dotenv import load_dotenv
+import data_utils as ut
 
 load_dotenv()
 
@@ -9,21 +10,12 @@ ID = os.getenv("REDDIT_CLIENT_ID")
 SECRET = os.getenv("REDDIT_CLIENT_SECRET")
 AGENT = os.getenv("REDDIT_USER_AGENT", "topic-modeler")
 
-# Find root folder
-def find_project_root():
-    current = Path(__file__).parent
-    while current != current.parent:
-        if current.name == "reddit-nlp":
-            return current
-        current = current.parent
-    return Path(__file__).parent  # Fallback
-
 # Input: Sub name, listing, post limit, time range
 # Default: None, new, 100 posts, last 24 HOURS
 # Output: Save raw .JSON to /data/raw/
 def get_raw_data(sub_name, from_hours, until_hours, listing="new", listing_args={"limit":100}):
     # Save to this dir
-    project_root = find_project_root()
+    project_root = ut.find_project_root()
     data_dir = project_root / "src" / "data" / "raw"
 
     # Reddit instance
@@ -83,7 +75,7 @@ def gather_comments(path):
         return
 
     # Save comments.JSON to this dir
-    project_root = find_project_root()
+    project_root = ut.find_project_root()
     data_dir = project_root / "src" / "data" / "raw" / "post_comments"
 
     # Reddit instance
