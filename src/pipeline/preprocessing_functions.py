@@ -26,7 +26,9 @@ def remove_stopwords(tokens, stopwords):
 
 # Load in stopwords.json
 def load_stopwords():
-    with open("./stopwords.json", mode="r", encoding="utf-8") as read_json:
+    project_root = sf.find_project_root()
+    stopwords_dir = project_root / "src" / "pipeline" / "stopwords.json"
+    with open(stopwords_dir, mode="r", encoding="utf-8") as read_json:
         stopwords = json.load(read_json)
     return set(stopwords) # Return as set for O(1) search
 
