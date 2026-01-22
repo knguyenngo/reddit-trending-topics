@@ -1,27 +1,19 @@
 import json
 import preprocessing_functions as pf
-import scrape_functions as sf
 from collections import Counter
 
-# Calculate word frequency for entire dataset
-def calculate_word_frequency(comments):
-    word_freq = {}
-    # Count word freq
-    for c in comments.values():
-        for word in c:
-            if word in word_freq:
-                word_freq[word] = word_freq[word] + 1
-            else:
-                word_freq[word] = 1
-    # Return dict sorted by frequency
-    return dict(sorted(word_freq.items(), key=lambda item: item[1]))
+# Count frequency of words
+# Corpus or per post
+def calculate_word_frequency(comments, word_freq):
+    word_freq.update(Counter(comments))
+    return word_freq
 
 # Find n-grams from cleaned data
-def find_ngrams(comments, n):
+def find_ngrams(data, n):
     ngrams = []
-    values = comments.values()
+    comments = data.values()
     # Go through comments of each post
-    for v in values:
+    for v in comments:
         # Index to stop generating ngrams
         stop = len(v)-n+1
         for i in range(stop):
@@ -36,24 +28,33 @@ def count_ngrams(ngrams):
     # Join ngram from tuple into string
     return {" ".join(ngram): count for ngram, count in counts.items()}
 
-# Save data to JSON
-def save_data(data, file_name, data_dir):
-    with open(f"{data_dir}/{file_name}", "w") as json_file:
-        json.dump(data, json_file, indent=1)
+# Count comments for entire dataset
+def get_comments_count(data):
+    return sum(len(c) for c in data.values())
 
-# Count frequency of words per post
-def post_word_frequency(comments):
-    word_freq = {}
-    for word in comments:
-        if word in word_freq:
-            word_freq[word] = word_freq[word] + 1
-        else:
-            word_freq[word] = 1
-    return dict(sorted(word_freq.items(), key=lambda item: item[1]))
+# Find statistics for posts
+def analyse_posts(raw_data, clean_data):
+    posts_analysis = {}
 
-# Perform post level analysis and save data
-def post_level_analysis(data, data_dir):
-    for p, c in data.items():
-        data[p] = post_word_frequency(c)
-    save_data(data, "post_level_analysis.json", data_dir)
+    for p, comments in raw_data.items():
+        # Word freq for this post
+        word_freq = {}
 
+        # Number of comments for current post
+        num_comments = len(comments)
+
+        # Find total length of raw comments
+        raw_length = sum(len(pf.tokenize(pf.clean(c))) for c in comments)
+
+        # Find total length, unique words, word freq and top words of cleaned comments
+        clean_length = len(clean_data[p])
+        unique_words = set(clean_data[p])
+        word_freq = calculate_word_frequency(clean_data[p], word_freq)
+        top_words = [word for word, count in sorted(word_freq.items(), key=lambda x: x[1], reverse=True)[:10]]
+
+        # All stats for this post
+        post_stats = {"comment_count": num_comments, "avg_raw_length": raw_length/num_comments, "avg_clean_length": clean_length/num_comments, "unique_words": len(unique_words), "vocab_richness": len(unique_words)/clean_length, "top_words": top_words}
+
+        posts_analysis[p] = post_stats
+
+    return posts_analysis
