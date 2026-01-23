@@ -13,12 +13,12 @@ def find_ngrams(data, n):
     ngrams = []
     comments = data.values()
     # Go through comments of each post
-    for v in comments:
+    for c in comments:
         # Index to stop generating ngrams
-        stop = len(v)-n+1
+        stop = len(c)-n+1
         for i in range(stop):
             # Append as tuple for counting
-            ngrams.append(tuple(v[i:i+n]))
+            ngrams.append(tuple(c[i:i+n]))
     return ngrams
 
 # Count occurences of each ngram
@@ -33,7 +33,7 @@ def get_comments_count(data):
     return sum(len(c) for c in data.values())
 
 # Find statistics for posts
-def analyse_posts(raw_data, clean_data):
+def analyze_posts(raw_data, clean_data):
     posts_analysis = {}
 
     for p, comments in raw_data.items():
@@ -58,3 +58,16 @@ def analyse_posts(raw_data, clean_data):
         posts_analysis[p] = post_stats
 
     return posts_analysis
+
+# Find statistics for all posts within time range
+def analyze_corpus(raw_data, clean_data):
+    # Set of unique words
+    unique_words = set().union(*clean_data.values())
+
+    # Calc word instances, word types and richness
+    total_comments = get_comments_count(raw_data)
+    total_tokens = sum(len(tokens) for tokens in clean_data.values())
+    vocab_size = len(unique_words)
+    vocab_richness = vocab_size / total_tokens
+
+    return {"total_comments" : total_comments, "total_tokens" : total_tokens, "vocabulary_size" : vocab_size, "vocabulary_richness" : vocab_richness}
