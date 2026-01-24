@@ -40,6 +40,12 @@ def load_comments(data_dir):
     
     return comments_dict
 
+def load_corpus_analysis(file_name):
+    data_dir = find_project_root() / "src" / "data" / "clean"
+    with open(f"{data_dir}/{file_name}", encoding="utf-8") as read_json:
+        analysis = json.load(read_json)
+    return analysis
+
 # Save cleaned comments as JSON
 def save_tokens(tokens, file_name):
     project_root = find_project_root()
