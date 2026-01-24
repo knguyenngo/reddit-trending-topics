@@ -22,24 +22,14 @@ Large Reddit threads are hard to read once they grow. This app focuses on making
 - Shows top posts and comments per theme
 - Visualizes everything in a web app
 
----
-
-## Tech stack
-- **Python** – data collection and processing  
-- **Hugging Face** – open-source NLP models for summarization and theme extraction  
-- **Apache Spark** – scalable text processing  
-- **Apache Airflow** – scheduled pipelines  
-- **SQLite** – storing processed results  
-- **React + TypeScript (Vite)** – interactive frontend  
-
----
+----
 
 ## Status
 
-Actively evolving. Core data flow, analysis, and UI are in place, with room to refine models, visuals, and automation.
+Coding analysis algorith...
 
 ---
 
 ## License
 
-MIT License © 2026 Khuong Nguyen
+MIT
