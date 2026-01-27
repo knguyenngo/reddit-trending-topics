@@ -1,35 +1,39 @@
 # Reddit Theme Explorer
 
 ## What this is
-
-This project pulls posts and comments from a subreddit, organizes conversations into high-level themes, and presents them in a simple UI so it’s easier to see what people are actually talking about.
+This project pulls posts and comments from a subreddit and analyzes discussion patterns using natural language processing. It identifies key themes, distinctive vocabulary, and conversation clusters to help you understand what a community is actually talking about.
 
 Data is collected in snapshots, so each run captures a moment in time rather than trying to mirror Reddit live.
 
 ---
 
-## Why it’s useful
-
-Large Reddit threads are hard to read once they grow. This app focuses on making conversations easier to explore by organizing discussion at the theme level and surfacing representative posts and comments.
+## Why it's useful
+Large subreddits generate thousands of comments that are hard to parse. This tool focuses on making conversations easier to explore by:
+- Identifying the most discussed topics (n-grams)
+- Finding what makes each post unique (TF-IDF)
+- Clustering similar discussions together
+- Highlighting distinctive vs common vocabulary
 
 ---
 
 ## What it does
-- Collects Reddit posts and comments
-- Handles nested threads and deleted content
-- Uses open-source machine learning models to summarize and group discussions
-- Groups conversations into themes
-- Shows top posts and comments per theme
-- Visualizes everything in a web app
+- Scrapes Reddit posts and comments using PRAW
+- Cleans and tokenizes text (removes noise, stopwords, Reddit formatting)
+- Calculates word frequencies and n-grams (bigrams, trigrams)
+- Computes TF-IDF scores to identify important terms per post
+- Uses cosine similarity to find related discussions
+- Generates comprehensive analysis reports with:
+  - Corpus-level statistics (vocabulary size, engagement metrics)
+  - Top engaged posts and their themes
+  - Topic clusters based on similarity
+  - Posts with distinctive vocabulary
 
-----
+---
 
 ## Status
-
-Coding analysis algorith...
+Analysis pipeline complete. Core NLP features implemented from scratch (preprocessing, TF-IDF, cosine similarity). Currently working on metadata tracking and multi-subreddit support.
 
 ---
 
 ## License
-
 MIT
