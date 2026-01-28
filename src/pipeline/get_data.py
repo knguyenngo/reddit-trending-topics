@@ -28,10 +28,10 @@ def main():
     scrape_config = {
             "praw_instance" : reddit,
             "subreddit": "",
-            "listing": "",
-            "listing_args": None,
-            "from_hours": None,
-            "until_hours": None,
+            "listing": "new",
+            "listing_args": {"limit": 100},
+            "from_hours": 72,
+            "until_hours": 0,
             "data_dir": data_dir / "raw",
             "current_date": time.strftime("%Y-%m-%d", time.localtime(time.time())),
             "current_time": time.time()
@@ -62,6 +62,11 @@ def main():
                 scrape_config["until_hours"] = int(currentVal)
     except getopt.error as err:
         print(str(err))
+
+    # Validate required arguments
+    if not scrape_config["subreddit"]:
+        print("Error: Subreddit is required. Use -s or --subreddit")
+        sys.exit(1)
 
     # Scrape all posts under listing within time range
     post_data = sf.get_raw_data(scrape_config)
