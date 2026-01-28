@@ -3,6 +3,15 @@ import data_utils as ut
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 
+# For comment filtering
+BOT_PHRASES = {
+    "action performed automatically",
+    "contact the moderators",
+    "composed message",
+    "karma subreddit acquired",
+    "questions or concerns"
+}
+
 # Input: dict of parameters
 # Output: Save raw .JSON to /data/raw/ and return dict for comment gathering
 def get_raw_data(scrape_config):
@@ -75,19 +84,28 @@ def gather_comments(data_objects, scrape_config):
         for submission in data_objects.values():
             executor.submit(get_post_comments, submission, sub_name, data_dir, current_date, current_time)
 
-# Helper function for getting comments from each post
 def get_post_comments(submission, sub_name, data_dir, current_date, current_time):
     # Filter for quality
     if (submission.num_comments > 9 and
         submission.score > 5 and
         not submission.stickied):
-            submission.comments.replace_more(limit=10)
+            submission.comments.replace_more(limit=0)
 
-            # Filter deleted, removed, and whitespace/empty comments
-            all_comments = [c.body for c in submission.comments.list() 
-            if c.body and c.body not in ['[deleted]', '[removed]'] and c.body.strip()]
+            all_comments = []
+            for c in submission.comments.list():
+                # Skip stickid comments
+                if c.stickied:
+                    continue
+                # Basic text clean up
+                body = c.body.strip() if c.body else ""
+                if not body or body in ['[deleted]', '[removed]']:
+                    continue
+                # Filter for bot phrases
+                if any(phrase in body.lower() for phrase in BOT_PHRASES):
+                    continue
+                all_comments.append(body)
 
-            if all_comments: # Generate file name and save
+            if all_comments: 
                 file_name = f"{submission.id}_{current_date}_{current_time}.json"
                 ut.save_data(all_comments, file_name, data_dir)
 
