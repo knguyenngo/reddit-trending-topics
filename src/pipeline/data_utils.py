@@ -40,11 +40,10 @@ def load_comments(data_dir):
     
     return comments_dict
 
-def load_analysis(file_name):
-    data_dir = find_project_root() / "src" / "data" / "clean"
+def load_data(file_name, data_dir):
     with open(f"{data_dir}/{file_name}", encoding="utf-8") as read_json:
-        analysis = json.load(read_json)
-    return analysis
+        data = json.load(read_json)
+    return data
 
 # Save cleaned comments as JSON
 def save_tokens(tokens, file_name):
