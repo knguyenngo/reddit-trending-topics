@@ -1,6 +1,7 @@
 import time, praw
-from pathlib import Path
 import data_utils as ut
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
 
 # Input: dict of parameters
 # Output: Save raw .JSON to /data/raw/ and return dict for comment gathering
@@ -69,23 +70,28 @@ def gather_comments(post_data, scrape_config):
     # Points data_dir to subreddit_dir / post_comments
     data_dir = subreddit_dir
 
-    # Gather comments from post ID
-    for post_id in post_data.keys():
-        submission = reddit.submission(id=post_id)
+    # Use threads to scrape comments from posts
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        for post_id in post_data.keys():
+            executor.submit(get_post_comments, post_id, reddit, sub_name, data_dir, current_date, current_time)
 
-        # Filter for quality
-        if (submission.num_comments > 9 and
-            submission.score > 5 and
-            not submission.stickied):
-                submission.comments.replace_more(limit=None)
+# Helper function for getting comments from each post
+def get_post_comments(post_id, reddit, sub_name, data_dir, current_date, current_time):
+    submission = reddit.submission(id=post_id)
 
-                # Filter deleted, removed, and whitespace/empty comments
-                all_comments = [c.body for c in submission.comments.list() 
-                if c.body and c.body not in ['[deleted]', '[removed]'] and c.body.strip()]
+    # Filter for quality
+    if (submission.num_comments > 9 and
+        submission.score > 5 and
+        not submission.stickied):
+            submission.comments.replace_more(limit=10)
 
-                # Generate file name and save
-                file_name = f"{post_id}_{current_date}_{current_time}.json"
-                ut.save_data(all_comments, file_name, data_dir)
+            # Filter deleted, removed, and whitespace/empty comments
+            all_comments = [c.body for c in submission.comments.list() 
+            if c.body and c.body not in ['[deleted]', '[removed]'] and c.body.strip()]
+
+            # Generate file name and save
+            file_name = f"{post_id}_{current_date}_{current_time}.json"
+            ut.save_data(all_comments, file_name, data_dir)
 
 # Generate meta data for current scrape
 def generate_meta_data(post_data, scrape_config):
