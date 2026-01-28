@@ -3,7 +3,6 @@ from pathlib import Path
 import data_utils as ut
 
 # Input: dict of parameters
-# Default: None, new, 100 posts, last 24 HOURS
 # Output: Save raw .JSON to /data/raw/ and return dict for comment gathering
 def get_raw_data(scrape_config):
     # Unpack parameters
@@ -22,8 +21,8 @@ def get_raw_data(scrape_config):
     submissions = listing_func(**listing_args)
 
     # Time range for posts
-    time_start = time.time() - (from_hours*3600) if from_hours else None
-    time_end = time.time() - (until_hours*3600) if until_hours else None
+    time_start = current_time - (from_hours*3600) if from_hours else None
+    time_end = current_time - (until_hours*3600) if until_hours else None
 
     # Dictionary for post id, title and time created
     data = {}
@@ -31,9 +30,12 @@ def get_raw_data(scrape_config):
     # Grabs all submissions from time range
     for submission in submissions:
         time_created = submission.created_utc
-
-        if (time_created >= time_start and time_created <= time_end):
-            data[submission.id] = {"title": submission.title, "time_created": time_created}
+        # Handle None cases for time filtering
+        if time_start is not None and time_created < time_start:
+            continue
+        if time_end is not None and time_created > time_end:
+            continue
+        data[submission.id] = {"title": submission.title, "time_created": time_created}
 
     # Sort data by time created
     sorted_data = dict(sorted(data.items(), key=lambda x: x[1]["time_created"]))
@@ -73,14 +75,12 @@ def gather_comments(post_data, scrape_config):
 
 def generate_meta_data(post_data, scrape_config):
     # Unpack parameters
-    reddit = scrape_config["praw_instance"]
     sub_name = scrape_config["subreddit"]
-    listing, listing_args = scrape_config["listing"], scrape_config["listing_args"]
+    listing = scrape_config["listing"]
     from_hours, until_hours = scrape_config["from_hours"], scrape_config["until_hours"]
-    data_dir = scrape_config["data_dir"]
     current_date, current_time = scrape_config["current_date"], scrape_config["current_time"]
 
     # Meta data for current scrape
-    meta_data = {"subreddit": sub_name, "date": current_date, "time": current_time, "time_range": {"from_hours": from_hours, "until_hours": until_hours}, "post_count": len(post_data), "posts_file": f"{sub_name}_{current_date}_{current_time}.json", "posts_id": list(post_data.keys())}
+    meta_data = {"subreddit": sub_name, "listing": listing, "date": current_date, "time": current_time, "time_range": {"from_hours": from_hours, "until_hours": until_hours}, "post_count": len(post_data), "posts_file": f"{sub_name}_{current_date}_{current_time}.json", "posts_id": list(post_data.keys())}
 
     return meta_data

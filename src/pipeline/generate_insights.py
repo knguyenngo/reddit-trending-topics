@@ -1,13 +1,15 @@
 import data_utils as ut
 
 def main():
-    corpus_analysis = ut.load_analysis("corpus_analysis.json")
-    posts_analysis = ut.load_analysis("post_analysis.json")
-    tfidf_analysis = ut.load_analysis("tfidf_analysis.json")
-    similar_posts = ut.load_analysis("similarity_analysis.json")
-    unigram_freq = ut.load_analysis("unigram_freq.json")
-    bigram_freq = ut.load_analysis("bigram_freq.json")
-    trigram_freq = ut.load_analysis("trigram_freq.json")
+    data_dir = find_project_root() / "src" / "data" / "clean"
+
+    corpus_analysis = ut.load_data("corpus_analysis.json", data_dir)
+    posts_analysis = ut.load_data("post_analysis.json", data_dir)
+    tfidf_analysis = ut.load_data("tfidf_analysis.json", data_dir)
+    similar_posts = ut.load_data("similarity_analysis.json", data_dir)
+    unigram_freq = ut.load_data("unigram_freq.json", data_dir)
+    bigram_freq = ut.load_data("bigram_freq.json", data_dir)
+    trigram_freq = ut.load_data("trigram_freq.json", data_dir)
 
     # Extract top uni/bi/trigrams for entire dataset
     corpus_analysis["top_unigrams"] = list(unigram_freq.keys())[-20:]

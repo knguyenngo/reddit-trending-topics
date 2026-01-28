@@ -40,6 +40,7 @@ def load_comments(data_dir):
     
     return comments_dict
 
+# Load data from directory
 def load_data(file_name, data_dir):
     with open(f"{data_dir}/{file_name}", encoding="utf-8") as read_json:
         data = json.load(read_json)
