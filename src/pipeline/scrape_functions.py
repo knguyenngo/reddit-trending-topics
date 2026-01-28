@@ -13,6 +13,13 @@ def get_raw_data(scrape_config):
     data_dir = scrape_config["data_dir"]
     current_date, current_time = scrape_config["current_date"], scrape_config["current_time"]
 
+    # Create data folder for subreddit if does not exist
+    subreddit_dir = data_dir / sub_name
+    subreddit_dir.mkdir(parents=True, exist_ok=True)
+
+    # Points data_dir to subreddit_dir
+    data_dir = subreddit_dir
+
     # Subreddit instance
     sub = reddit.subreddit(sub_name)
 
@@ -51,8 +58,16 @@ def get_raw_data(scrape_config):
 # Output: Save individual posts and their comments to JSON
 def gather_comments(post_data, scrape_config):
     reddit = scrape_config["praw_instance"]
-    data_dir = scrape_config["data_dir"] / "post_comments"
+    sub_name = scrape_config["subreddit"]
+    data_dir = scrape_config["data_dir"]
     current_date, current_time = scrape_config["current_date"], scrape_config["current_time"]
+
+    # Create posts_comments folder for subreddit if does not exist
+    subreddit_dir = data_dir / sub_name / "post_comments"
+    subreddit_dir.mkdir(parents=True, exist_ok=True)
+
+    # Points data_dir to subreddit_dir / post_comments
+    data_dir = subreddit_dir
 
     # Gather comments from post ID
     for post_id in post_data.keys():
@@ -68,11 +83,11 @@ def gather_comments(post_data, scrape_config):
                 all_comments = [c.body for c in submission.comments.list() 
                 if c.body and c.body not in ['[deleted]', '[removed]'] and c.body.strip()]
 
+                # Generate file name and save
                 file_name = f"{post_id}_{current_date}_{current_time}.json"
-
-                # Save JSON
                 ut.save_data(all_comments, file_name, data_dir)
 
+# Generate meta data for current scrape
 def generate_meta_data(post_data, scrape_config):
     # Unpack parameters
     sub_name = scrape_config["subreddit"]
