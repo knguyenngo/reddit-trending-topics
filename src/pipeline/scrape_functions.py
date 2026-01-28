@@ -32,8 +32,8 @@ def get_raw_data(scrape_config):
     time_start = current_time - (from_hours*3600) if from_hours else None
     time_end = current_time - (until_hours*3600) if until_hours else None
 
-    # Dictionary for post id, title and time created
-    data = {}
+    # Dictionary for post id, title and time created and dict for submission obj
+    data, data_objects = {}, {}
 
     # Grabs all submissions from time range
     for submission in submissions:
@@ -44,6 +44,7 @@ def get_raw_data(scrape_config):
         if time_end is not None and time_created > time_end:
             continue
         data[submission.id] = {"title": submission.title, "time_created": time_created}
+        data_objects[submission.id] = submission
 
     # Sort data by time created
     sorted_data = dict(sorted(data.items(), key=lambda x: x[1]["time_created"]))
@@ -53,12 +54,11 @@ def get_raw_data(scrape_config):
     ut.save_data(sorted_data, file_name, data_dir)
 
     # Return for comment extraction
-    return sorted_data
+    return data_objects, sorted_data
 
 # Input: dict of post_data and dict of parameters for current scrape
 # Output: Save individual posts and their comments to JSON
-def gather_comments(post_data, scrape_config):
-    reddit = scrape_config["praw_instance"]
+def gather_comments(data_objects, scrape_config):
     sub_name = scrape_config["subreddit"]
     data_dir = scrape_config["data_dir"]
     current_date, current_time = scrape_config["current_date"], scrape_config["current_time"]
@@ -72,13 +72,11 @@ def gather_comments(post_data, scrape_config):
 
     # Use threads to scrape comments from posts
     with ThreadPoolExecutor(max_workers=10) as executor:
-        for post_id in post_data.keys():
-            executor.submit(get_post_comments, post_id, reddit, sub_name, data_dir, current_date, current_time)
+        for submission in data_objects.values():
+            executor.submit(get_post_comments, submission, sub_name, data_dir, current_date, current_time)
 
 # Helper function for getting comments from each post
-def get_post_comments(post_id, reddit, sub_name, data_dir, current_date, current_time):
-    submission = reddit.submission(id=post_id)
-
+def get_post_comments(submission, sub_name, data_dir, current_date, current_time):
     # Filter for quality
     if (submission.num_comments > 9 and
         submission.score > 5 and
@@ -89,9 +87,9 @@ def get_post_comments(post_id, reddit, sub_name, data_dir, current_date, current
             all_comments = [c.body for c in submission.comments.list() 
             if c.body and c.body not in ['[deleted]', '[removed]'] and c.body.strip()]
 
-            # Generate file name and save
-            file_name = f"{post_id}_{current_date}_{current_time}.json"
-            ut.save_data(all_comments, file_name, data_dir)
+            if all_comments: # Generate file name and save
+                file_name = f"{submission.id}_{current_date}_{current_time}.json"
+                ut.save_data(all_comments, file_name, data_dir)
 
 # Generate meta data for current scrape
 def generate_meta_data(post_data, scrape_config):

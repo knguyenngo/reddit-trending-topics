@@ -69,9 +69,9 @@ def main():
         sys.exit(1)
 
     # Scrape all posts under listing within time range
-    post_data = sf.get_raw_data(scrape_config)
+    data_objects, post_data = sf.get_raw_data(scrape_config)
     # Gather comments from post dict
-    sf.gather_comments(post_data, scrape_config)
+    sf.gather_comments(data_objects, scrape_config)
 
     # Meta data for current scrape
     meta_data = sf.generate_meta_data(post_data, scrape_config)
