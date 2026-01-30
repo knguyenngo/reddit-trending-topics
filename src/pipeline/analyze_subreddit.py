@@ -1,5 +1,6 @@
 # Data handling
 import data_utils as ut
+import sys
 
 # Text processing
 import preprocessing_functions as pf
@@ -11,9 +12,20 @@ import similarity_functions as sm
 
 def main():
     # ============================================================================
+    # STEP 0: GET SUBREDDIT FROM COMMAND LINE
+    # ============================================================================
+    if len(sys.argv) < 2:
+        print("Error: Subreddit name required")
+        print("Usage: python analyze_subreddit.py <subreddit_name>")
+        sys.exit(1)
+    
+    subreddit = sys.argv[1]
+    print(f"Analyzing r/{subreddit}...")
+    
+    # ============================================================================
     # STEP 1: LOAD RAW DATA
     # ============================================================================
-    raw_data = ut.load_comments("raw")
+    raw_data = ut.load_comments(f"raw/{subreddit}")
     stopwords = ut.load_stopwords()
     clean_data = {}
     posts_tfidf = {}
@@ -82,9 +94,12 @@ def main():
         similarity_analysis[post] = similar_posts
     
     # ============================================================================
-    # STEP 8: SAVE RESULTS
+    # STEP 8: SAVE RESULTS (subreddit-specific folder)
     # ============================================================================
-    data_dir = ut.find_project_root() / "src" / "data" / "clean"
+    data_dir = ut.find_project_root() / "src" / "data" / "clean" / subreddit
+    # Create subreddit directory if it doesn't exist
+    data_dir.mkdir(parents=True, exist_ok=True)
+    
     ut.save_data(similarity_analysis, "similarity_analysis.json", data_dir)
     ut.save_data(posts_tfidf, "tfidf_analysis.json", data_dir)
     ut.save_data(post_analysis, "post_analysis.json", data_dir)
@@ -92,6 +107,8 @@ def main():
     ut.save_data(unigram_freq, "unigram_freq.json", data_dir)
     ut.save_data(bigram_freq, "bigram_freq.json", data_dir)
     ut.save_data(trigram_freq, "trigram_freq.json", data_dir)
+    
+    print(f"Analysis complete! Results saved to {data_dir}")
 
 if __name__ == "__main__":
     main()
