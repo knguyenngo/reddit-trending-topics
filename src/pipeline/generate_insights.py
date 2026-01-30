@@ -1,8 +1,23 @@
 import data_utils as ut
+import sys
 
 def main():
-    data_dir = find_project_root() / "src" / "data" / "clean"
-
+    # ============================================================================
+    # STEP 0: GET SUBREDDIT FROM COMMAND LINE
+    # ============================================================================
+    if len(sys.argv) < 2:
+        print("Error: Subreddit name required")
+        print("Usage: python generate_insights.py <subreddit_name>")
+        sys.exit(1)
+    
+    subreddit = sys.argv[1]
+    print(f"Generating insights for r/{subreddit}...")
+    
+    # ============================================================================
+    # STEP 1: LOAD ANALYSIS DATA
+    # ============================================================================
+    data_dir = ut.find_project_root() / "src" / "data" / "clean" / subreddit
+    
     corpus_analysis = ut.load_data("corpus_analysis.json", data_dir)
     posts_analysis = ut.load_data("post_analysis.json", data_dir)
     tfidf_analysis = ut.load_data("tfidf_analysis.json", data_dir)
@@ -10,30 +25,40 @@ def main():
     unigram_freq = ut.load_data("unigram_freq.json", data_dir)
     bigram_freq = ut.load_data("bigram_freq.json", data_dir)
     trigram_freq = ut.load_data("trigram_freq.json", data_dir)
-
-    # Extract top uni/bi/trigrams for entire dataset
+    
+    # ============================================================================
+    # STEP 2: EXTRACT TOP N-GRAMS
+    # ============================================================================
     corpus_analysis["top_unigrams"] = list(unigram_freq.keys())[-20:]
     corpus_analysis["top_bigrams"] = list(bigram_freq.keys())[-20:]
     corpus_analysis["top_trigrams"] = list(trigram_freq.keys())[-15:]
-
-    # Extract highest engagement posts
+    
+    # ============================================================================
+    # STEP 3: EXTRACT HIGHEST ENGAGEMENT POSTS
+    # ============================================================================
     posts_analysis = dict(sorted(posts_analysis.items(), key=lambda item: item[1]['comment_count'], reverse=True))
     corpus_analysis["top_engaged_posts"] = dict(list(posts_analysis.items())[:20])
-
-    # Extract topic clusters from similar posts to top engagement posts
+    
+    # ============================================================================
+    # STEP 4: EXTRACT TOPIC CLUSTERS
+    # ============================================================================
     top_posts = corpus_analysis["top_engaged_posts"]
     topic_clusters = {}
     for post in top_posts:
         topic_clusters[post] = similar_posts[post]
     corpus_analysis["topic_clusters"] = topic_clusters
-
-    # Distinct posts with high vocab richness
+    
+    # ============================================================================
+    # STEP 5: EXTRACT DISTINCT POSTS
+    # ============================================================================
     posts_analysis = dict(sorted(posts_analysis.items(), key=lambda item: item[1]['vocab_richness'], reverse=True))
     corpus_analysis["distinct_posts"] = dict(list(posts_analysis.items())[:20])
-
-    # Save analysis
-    data_dir = ut.find_project_root() / "src" / "data" / "clean"
-    ut.save_data(corpus_analysis, "updated_corpus_analysis.json", data_dir) 
+    
+    # ============================================================================
+    # STEP 6: SAVE INSIGHTS
+    # ============================================================================
+    ut.save_data(corpus_analysis, "final_insights.json", data_dir)
+    print(f"Insights generated! Saved to {data_dir}/final_insights.json")
 
 if __name__ == "__main__":
     main()
