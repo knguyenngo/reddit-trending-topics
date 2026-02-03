@@ -1,49 +1,22 @@
-import React, { useState } from "react";
-import topics from "../../data/clean/topics.json";
-import BubbleChart from "./components/BubbleChart";
-import NavBar from "./components/NavBar.tsx";
-import CommentView from "./components/CommentView.tsx";
-import "./styles/App.css";
+import { useEffect, useState } from 'react';
+import { fetchCorpusAnalysis } from './utils/dataLoader';
+import type { CorpusAnalysis } from './types';
+import CorpusStats from './components/CorpusStats';
 
 function App() {
-  const [selectedTopic, setSelectedTopic] = useState<any | null>(null);
+  const [corpusData, setCorpusData] = useState<CorpusAnalysis | null>(null);
 
-  const handleSelectTopic = (topic: any) => {
-    setSelectedTopic(topic);
-  };
+  useEffect(() => {
+    fetchCorpusAnalysis('GlobalOffensive')
+      .then(setCorpusData)
+      .catch(console.error);
+  }, []);
 
-  const handleDeselectTopic = () => {
-    setSelectedTopic(null);
-  };
+  if (!corpusData) {
+    return <div>Loading...</div>;
+  }
 
-  return (
-    <div className="h-screen flex flex-col">
-      <NavBar />
-      <h1 className="flex justify-center text-2xl font-medium mb-4">
-        Topic Bubble Chart
-      </h1>
-
-      <div className="flex flex-1 w-full bg-black">
-        {/* Chart container */}
-        <div
-          className={`flex justify-center transition-all duration-300 ${
-selectedTopic ? "w-1/2" : "w-full"
-}`}
-        >
-          <BubbleChart data={topics.community_opinions} onSelectTopic={handleSelectTopic} />
-        </div>
-
-        {/* Comment panel (only if a topic is selected) */}
-        {selectedTopic && (
-          <CommentView
-            topic={selectedTopic}
-            onDeselect={handleDeselectTopic}
-          />
-        )}
-      </div>
-    </div>
-  );
+  return <CorpusStats data={corpusData} />;
 }
 
 export default App;
-
