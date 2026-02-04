@@ -29,3 +29,8 @@ export const fetchTFIDFAnalysis = (subreddit: string): Promise<TFIDFAnalysis> =>
 export const fetchSimilarityAnalysis = (subreddit: string): Promise<Record<string, SimilarityAnalysis>> => {
   return fetchJSON<Record<string, SimilarityAnalysis>>(subreddit, "similarity_analysis");
 }
+
+// Grab unigram frequencies for entire dataset
+export const fetchUnigrams = (subreddit: string): Promise<UnigramFrequency> => {
+  return fetchJSON<UnigramFrequency>(subreddit, "unigram_freq");
+}

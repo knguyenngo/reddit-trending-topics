@@ -24,3 +24,5 @@ interface TFIDFAnalysis {
 }
 
 type SimilarityAnalysis = Record<string, [string, number][]>;
+
+type UnigramFrequency = Record<string, number>;
