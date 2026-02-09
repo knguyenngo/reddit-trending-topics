@@ -40,6 +40,17 @@ def load_comments(data_dir):
     
     return comments_dict
 
+# Load posts data from subreddit directory
+def load_posts_data(subreddit):
+    project_root = find_project_root()
+    reddit_dir = project_root / "src" / "data" / "raw" / subreddit
+
+    posts_files = list(reddit_dir.glob(f"{subreddit}_*.json"))
+
+    if posts_files:
+        latest_post_file = max(posts_files, key=lambda p: p.stat().st_mtime)
+        return load_data(latest_post_file.name, reddit_dir)
+
 # Load data from directory
 def load_data(file_name, data_dir):
     with open(f"{data_dir}/{file_name}", encoding="utf-8") as read_json:
