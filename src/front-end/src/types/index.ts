@@ -10,6 +10,8 @@ interface CorpusAnalysis {
 }
 
 interface PostAnalysis {
+  title: string;
+  time_created: number;
   comment_count: number;
   avg_raw_length: number;
   avg_clean_length: number;
