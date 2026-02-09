@@ -10,7 +10,7 @@ function FrequencyChart(props: { data : UnigramFrequency}) {
     value: count
   }))
   .sort((a, b) => b.value - a.value) // Sort by freq
-  .slice(0, 20); // Top 15 words
+  .slice(0, 15); // Top 15 words
 
   return (
     <div className="flex flex-col bg-red-500 rounded-[2rem] gap-4 w-full h-full p-4">
@@ -24,9 +24,9 @@ function FrequencyChart(props: { data : UnigramFrequency}) {
             interval={0}
             angle={-45}
             textAnchor="end"
-            height={50}
+            height={65}
             dx={-5}
-            dy={15}
+            dy={20}
           />
           <YAxis hide />
           <Tooltip />
