@@ -33,12 +33,16 @@ def get_comments_count(data):
     return sum(len(c) for c in data.values())
 
 # Find statistics for posts
-def analyze_posts(raw_data, clean_data):
+def analyze_posts(posts, raw_data, clean_data):
     posts_analysis = {}
 
     for p, comments in raw_data.items():
         # Word freq for this post
         word_freq = {}
+
+        # Title of current post and time created
+        post_id = p.split("_")[0]
+        post_title, time_created = posts[post_id]["title"], posts[post_id]["time_created"]
 
         # Number of comments for current post
         num_comments = len(comments)
@@ -53,7 +57,7 @@ def analyze_posts(raw_data, clean_data):
         top_words = [word for word, count in sorted(word_freq.items(), key=lambda x: x[1], reverse=True)[:10]]
 
         # All stats for this post
-        post_stats = {"comment_count": num_comments, "avg_raw_length": raw_length/num_comments, "avg_clean_length": clean_length/num_comments, "unique_words": len(unique_words), "vocab_richness": len(unique_words)/clean_length, "top_words": top_words}
+        post_stats = {"title": post_title, "time_created": time_created, "comment_count": num_comments, "avg_raw_length": raw_length/num_comments, "avg_clean_length": clean_length/num_comments, "unique_words": len(unique_words), "vocab_richness": len(unique_words)/clean_length, "top_words": top_words}
 
         posts_analysis[p] = post_stats
 
