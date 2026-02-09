@@ -26,6 +26,7 @@ def main():
     # STEP 1: LOAD RAW DATA
     # ============================================================================
     raw_data = ut.load_comments(f"raw/{subreddit}")
+    posts_data = ut.load_posts_data(subreddit)
     stopwords = ut.load_stopwords()
     clean_data = {}
     posts_tfidf = {}
@@ -58,7 +59,7 @@ def main():
     # ============================================================================
     # STEP 4: STATISTICAL ANALYSIS - Post and corpus level metrics
     # ============================================================================
-    post_analysis = af.analyze_posts(raw_data, clean_data)
+    post_analysis = af.analyze_posts(posts_data, raw_data, clean_data)
     corpus_analysis = af.analyze_corpus(raw_data, clean_data)
     
     # ============================================================================
@@ -91,7 +92,7 @@ def main():
     similarity_analysis = {}
     for post in posts_tfidf.keys():
         similar_posts = sm.find_similar_posts(post, all_post_vectors)
-        similarity_analysis[post] = similar_posts
+        similarity_analysis[post] = {"similar_posts" : similar_posts}
     
     # ============================================================================
     # STEP 8: SAVE RESULTS (subreddit-specific folder)
