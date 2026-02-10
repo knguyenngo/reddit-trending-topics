@@ -6,7 +6,8 @@ function TopPosts(props: { data : CorpusAnalysis}) {
   const topPosts = Object.entries(props.data.top_engaged_posts)
   .map(([id, postObject]) => ({
     post_title: postObject.title,
-    comments: postObject.comment_count
+    comment_count: postObject.comment_count,
+    vocab_richness: (postObject.vocab_richness * 100).toFixed(2)
   }))
   .sort((a, b) => b.comments - a.comments) // Sort by comment count
 
@@ -17,7 +18,10 @@ function TopPosts(props: { data : CorpusAnalysis}) {
         .map((post) => (
           <div key={post.post_title} className="flex items-center justify-between p-3 bg-black/50 hover:bg-black/80 rounded-xl transition-all cursor-pointer w-full text-white">
             <span className="truncate pr-4 text-sm font-medium">{post.post_title}</span>
-            <span className="text-xs bg-red-500 px-2 py-1 rounded-full">{post.comments}</span>
+            <div className="flex gap-1">
+              <span className="text-xs bg-red-500 px-2 py-1 rounded-full">{post.comment_count}</span>
+              <span className="text-xs bg-black px-2 py-1 rounded-full">{post.vocab_richness}%</span>
+            </div>
           </div>
         ))
       }
