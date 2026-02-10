@@ -9,7 +9,7 @@ function TopPosts(props: { data : CorpusAnalysis}) {
     comment_count: postObject.comment_count,
     vocab_richness: (postObject.vocab_richness * 100).toFixed(2)
   }))
-  .sort((a, b) => b.comments - a.comments) // Sort by comment count
+  .sort((a, b) => b.comment_count - a.comment_count) // Sort by comment count
 
   return (
     <div className="flex flex-col items-center bg-red-500 rounded-[2rem] gap-4 w-full h-[400px] overflow-y-auto scrollbar-hide p-4">
