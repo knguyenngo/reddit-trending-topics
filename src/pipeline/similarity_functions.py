@@ -23,7 +23,7 @@ def vectorize_posts(post_tfidf, word_types):
             post_vector[i] = post_tfidf[word]
     return post_vector
 
-def find_similar_posts(post_id, all_post_vectors, n=5):
+def find_similar_posts(post_id, posts, all_post_vectors, n=5):
     # Get vector of current post
     current_post_vector = all_post_vectors[post_id]
     similar_posts = {}
@@ -31,8 +31,12 @@ def find_similar_posts(post_id, all_post_vectors, n=5):
     # Calculate similarity between current post and all other post vectors
     for post, vector in all_post_vectors.items():
         if post != post_id:
+            current_id = post.split("_")[0]
             similarity = cosine_similarity(current_post_vector, vector)
-            similar_posts[post] = similarity
+            similar_posts[post] = { "similarity" : similarity, "title" : posts[current_id]["title"] }
 
     # Return top n similar posts
-    return [(post, cosine_sim) for post, cosine_sim in sorted(similar_posts.items(), key=lambda x: x[1], reverse=True)[:n]]
+    return [
+        {"post_id": post, "similarity": data["similarity"], "title": data["title"]} 
+        for post, data in sorted(similar_posts.items(), key=lambda x: x[1]["similarity"], reverse=True)[:n]
+    ]
