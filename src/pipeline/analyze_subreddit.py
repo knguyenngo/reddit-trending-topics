@@ -92,7 +92,7 @@ def main():
     similarity_analysis = {}
     for post in posts_tfidf.keys():
         similar_posts = sm.find_similar_posts(post, posts_data, all_post_vectors)
-        similarity_analysis[post] = {"similar_posts" : similar_posts}
+        similarity_analysis[post] = similar_posts
     
     # ============================================================================
     # STEP 8: SAVE RESULTS (subreddit-specific folder)
