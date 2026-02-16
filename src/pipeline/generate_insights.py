@@ -44,8 +44,17 @@ def main():
     # ============================================================================
     top_posts = corpus_analysis["top_engaged_posts"]
     topic_clusters = {}
-    for post in top_posts:
-        topic_clusters[post] = similar_posts[post]
+    for post_id in top_posts:
+        post_data = top_posts[post_id]
+        similar_posts_to_id = similar_posts[post_id]
+
+        # Go through similar posts and add top tfidf for each post
+        for similar in similar_posts_to_id:
+            similar_id = similar["post_id"]
+            top_words = tfidf_analysis[similar_id]["top_tfidf_words"]
+            similar["top_words"] = top_words
+
+        topic_clusters[post_data["title"]] = similar_posts[post_id]
     corpus_analysis["topic_clusters"] = topic_clusters
     
     # ============================================================================
