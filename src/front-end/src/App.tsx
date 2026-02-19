@@ -4,6 +4,7 @@ import type { CorpusAnalysis, UnigramFrequency } from './types';
 import CorpusStats from './components/CorpusStats';
 import FrequencyChart from './components/FrequencyChart';
 import TopPosts from './components/TopPosts';
+import PostClusters from './components/PostClusters';
 import './App.css';
 
 function App() {
@@ -38,7 +39,7 @@ function App() {
           <CorpusStats data={corpusData}/>
           <FrequencyChart data={unigramData}/>
           <TopPosts data={corpusData}/>
-          <div className="bg-white"></div>
+          <PostClusters data={corpusData}/>
         </div>
       </div>
     </div>
