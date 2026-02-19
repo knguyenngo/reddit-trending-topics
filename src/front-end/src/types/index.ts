@@ -7,6 +7,7 @@ interface CorpusAnalysis {
   top_bigrams: string[];
   top_trigrams: string[];
   top_engaged_posts: Record<string, PostAnalysis>;
+  topic_clusters: Record<string, SimilarPost[]>;
 }
 
 interface PostAnalysis {
@@ -17,6 +18,12 @@ interface PostAnalysis {
   avg_clean_length: number;
   unique_words: number;
   vocab_richness: number;
+  top_words: string[];
+}
+
+interface SimilarPost {
+  title: string;
+  similarity: number;
   top_words: string[];
 }
 
