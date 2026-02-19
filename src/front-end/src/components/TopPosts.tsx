@@ -2,7 +2,7 @@ import React from "react";
 import type { CorpusAnalysis } from "../types/index.ts"
 
 function TopPosts(props: { data : CorpusAnalysis}) {
-  // Convert data into object for Recharts
+  // Convert data into object
   const topPosts = Object.entries(props.data.top_engaged_posts)
   .map(([id, postObject]) => ({
     post_title: postObject.title,
